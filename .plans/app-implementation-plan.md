@@ -95,7 +95,7 @@ Based on the current better-sqlite3 docs and package metadata:
   - `db.prepare(...).all()`
 - The docs recommend enabling:
   - `PRAGMA journal_mode = WAL`
-- Current package metadata indicates support for current modern Node versions, including Node 22.
+- Current package metadata indicates support for current modern Node versions, including Node 24.
 - For TypeScript support, the ecosystem currently uses:
   - `@types/better-sqlite3`
 
@@ -120,7 +120,7 @@ Based on the current better-sqlite3 docs and package metadata:
 
 ### Recommended Node version
 
-- **Node 22 LTS**
+- **Node 24**
 
 Reasoning:
 
