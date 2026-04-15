@@ -29,6 +29,11 @@ data/*.db-wal
 # Coverage
 coverage/
 
+# Local tooling artifacts
+.playwright-mcp/
+.tanstack/
+.claude/settings.local.json
+
 # OS / editor files
 .DS_Store
 Thumbs.db
