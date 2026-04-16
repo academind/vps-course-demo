@@ -88,7 +88,7 @@ function Home() {
             {isSubmitting ? 'Submitting…' : 'Submit idea'}
           </button>
 
-          <div aria-live="polite" className="mt-5 min-h-[1.5rem] text-sm">
+          <div aria-live="polite" className="mt-5 min-h-6 text-sm">
             {status === 'success' && (
               <p
                 role="status"
