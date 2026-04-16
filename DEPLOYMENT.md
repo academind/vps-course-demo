@@ -21,8 +21,10 @@
   - reverse proxy
   - HTTP → HTTPS redirect
   - Let's Encrypt certificate management
+  - only public entrypoint; publishes host ports `80` and `443`
 - `app`
   - TanStack Start app on port `3000`
+  - not published on the host; only reachable internally via Traefik
   - SQLite database at `/app/data/ideas.db`
 
 ## Environment variables
@@ -42,11 +44,44 @@ ACME_EMAIL=you@example.com
 
 Both values are required. `docker compose` will fail fast if they are missing or empty.
 
-## Deploy
+## Get the project onto the VPS
+
+Choose one approach.
+
+### 1) `scp`
+From the folder that contains `vps-demo-app`:
 
 ```bash
-git clone <YOUR_REPO_URL> vps-demo-app
-cd vps-demo-app
+scp -r vps-demo-app <USER>@<VPS_IP>:~/
+ssh <USER>@<VPS_IP>
+cd ~/vps-demo-app
+```
+
+`scp` can copy folders recursively with `-r`, but it has no native exclude flag. If you want to skip `node_modules`, `.git`, `.env`, or `data`, use `rsync` instead.
+
+### 2) `rsync`
+From your local machine:
+
+```bash
+rsync -av --exclude node_modules --exclude .git --exclude .env --exclude data ./ <USER>@<VPS_IP>:~/vps-demo-app/
+ssh <USER>@<VPS_IP>
+cd ~/vps-demo-app
+```
+
+Windows: run the same `rsync` command inside WSL.
+
+### 3) `git`
+On the VPS:
+
+```bash
+git clone <YOUR_REPO_URL> ~/vps-demo-app
+cd ~/vps-demo-app
+```
+
+## Deploy on the VPS
+
+```bash
+cd ~/vps-demo-app
 cp .env.example .env
 # edit .env
 docker compose up -d --build
@@ -68,8 +103,13 @@ https://YOUR_DOMAIN
 
 ## Update
 
+- `git`: run `git pull`
+- `rsync`: run the same `rsync` command again
+- `scp`: best for the first upload; for updates, `rsync` or `git` is usually easier
+
+Then rebuild:
+
 ```bash
-git pull
 docker compose up -d --build app
 ```
 
@@ -129,6 +169,8 @@ docker compose logs -f traefik
 
 - DNS must already point `APP_DOMAIN` to the VPS before Let's Encrypt can succeed
 - Port `80` must be reachable because Traefik uses the HTTP-01 challenge
-- If you use `ufw`, allow inbound `80` and `443`
+- `compose.yml` publishes `80` and `443` via Docker (`traefik` only). Docker-published ports bypass normal `ufw` filtering, so do not rely on `ufw` to restrict vps ports
+- In this project that is acceptable because only `traefik` publishes `80` and `443`; the `app` service does **not** publish `3000`
+- If your VPS provider has a network firewall / security group, allow inbound `80` and `443` there too
 - Avoid repeated failed Let's Encrypt attempts while troubleshooting; production has rate limits. If you need lots of retries, test with Let's Encrypt staging first and then switch back to production
 - Both services use `restart: unless-stopped`
