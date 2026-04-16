@@ -12,7 +12,6 @@
 
 - `compose.yml`
 - `Dockerfile`
-- `traefik/traefik.yml`
 - `.env`
 
 ## What gets deployed

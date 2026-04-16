@@ -5,6 +5,13 @@ services:
     image: traefik:v3.6
     restart: unless-stopped
     command:
+      - --entrypoints.web.address=:80
+      - --entrypoints.web.http.redirections.entrypoint.to=websecure
+      - --entrypoints.web.http.redirections.entrypoint.scheme=https
+      - --entrypoints.web.http.redirections.entrypoint.permanent=true
+      - --entrypoints.websecure.address=:443
+      - --providers.docker.endpoint=unix:///var/run/docker.sock
+      - --providers.docker.exposedbydefault=false
       - --certificatesresolvers.letsencrypt.acme.email=${ACME_EMAIL:?ACME_EMAIL is required}
       - --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json
       - --certificatesresolvers.letsencrypt.acme.httpchallenge=true
@@ -13,7 +20,6 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./traefik/traefik.yml:/etc/traefik/traefik.yml:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - traefik_letsencrypt:/letsencrypt
     networks:
@@ -37,7 +43,6 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.ideas.rule=Host(`${APP_DOMAIN:?APP_DOMAIN is required}`)"
       - "traefik.http.routers.ideas.entrypoints=websecure"
-      - "traefik.http.routers.ideas.service=ideas"
       - "traefik.http.routers.ideas.tls=true"
       - "traefik.http.routers.ideas.tls.certresolver=letsencrypt"
       - "traefik.http.services.ideas.loadbalancer.server.port=3000"
