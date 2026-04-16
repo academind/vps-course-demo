@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { ideaSchema, submitIdea } from '../lib/ideas'
+import { IDEA_MAX_LENGTH, ideaSchema, submitIdea } from '../lib/ideas'
 
 export const Route = createFileRoute('/')({
   component: Home,
@@ -74,6 +74,7 @@ function Home() {
               }
             }}
             disabled={isSubmitting}
+            maxLength={IDEA_MAX_LENGTH}
             rows={6}
             placeholder="What's on your mind?"
             className="mt-2 w-full resize-y rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-base text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/40 disabled:opacity-60"
